@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { body,param, validationResult } from 'express-validator';
-import {getAllUsers} from './services/userService'; // Import your user service 
-import {getAllToDos, getToDosByUserId} from './services/toDoService'; // Import your todo service 
+import {getAllUsers, getUserById} from './services/userService'; // Import your user service 
+import {getAllToDos, getToDosByUserId, getToDoById,getToDoByUserIdAndToDoId} from './services/toDoService'; // Import your todo service 
 
 // Middleware to check if users list is empty
 export function checkUsersList(req: Request, res: Response, next: NextFunction) {
@@ -13,10 +13,31 @@ export function checkUsersList(req: Request, res: Response, next: NextFunction) 
   next();
 }
 
+//Middleware to check if user is disabled
+export function checkUserIsDisabled(req: Request, res: Response, next: NextFunction) {
+  const userId = Number(req.params.id); // Convert the id from string to number
+  const user = getUserById(userId); // Get user from your user service
+
+  if (user!.isDisabled) {
+    return res.status(200).json({ message: "This user is disabled" });
+  }
+  next();
+}
+
 // Middleware to validate 'GET' request for a user by ID
 export const validateUserById = [
   param('id').isInt().withMessage('User ID must be an integer'),
-  handleValidationErrors
+  handleValidationErrors,
+  (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.params.id); // Convert the id from string to number
+    const user = getUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    next();
+  }
 ];
 
 // Middleware to validate user creation
@@ -39,7 +60,23 @@ export const validateUserUpdate = [
 export const validateUserIdAndToDoIdParams = [
   param('userId').isInt().withMessage('User ID must be an integer'),
   param('id').isInt().withMessage('To-do ID must be an integer'),
-  handleValidationErrors
+  handleValidationErrors,
+  (req: Request, res: Response, next: NextFunction) => {
+    const userId = Number(req.params.userId);
+    const toDoId = Number(req.params.id);
+
+    const user = getUserById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const toDo = getToDoByUserIdAndToDoId(userId, toDoId);
+    if (!toDo) {
+      return res.status(404).json({ error: 'To-do item not found for this user' });
+    }
+
+    next();
+  }
 ];
 
 // Middleware to check if users list is empty
@@ -66,7 +103,17 @@ export function checkToDosListOfUser(req: Request, res: Response, next: NextFunc
 // Middleware to validate 'GET' request for a to-do by ID
 export const validateToDoById = [
   param('id').isInt().withMessage('To-do ID must be an integer'),
-  handleValidationErrors
+  handleValidationErrors,
+  (req: Request, res: Response, next: NextFunction) => {
+    const toDoId = Number(req.params.id); // Convert the id from string to number
+    const toDo = getToDoById(toDoId);
+
+    if (!toDo) {
+      return res.status(404).json({ error: 'To-do not found' });
+    }
+
+    next();
+  }
 ];
 
 // Middleware to validate todo creation
