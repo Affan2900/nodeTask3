@@ -23,7 +23,6 @@ export function checkUserIsDisabled(req: Request, res: Response, next: NextFunct
   }
   next();
 }
-//random
 
 // Middleware to validate 'GET' request for a user by ID
 export const validateUserById = [
@@ -59,12 +58,12 @@ export const validateUserUpdate = [
 
 // Middleware to validate 'GET' request for a specific to-do of a user
 export const validateUserIdAndToDoIdParams = [
-  param('userId').isInt().withMessage('User ID must be an integer'),
-  param('id').isInt().withMessage('To-do ID must be an integer'),
+  param('id').isInt().withMessage('User ID must be an integer'),
+  param('toDoId').isInt().withMessage('To-do ID must be an integer'),
   handleValidationErrors,
   (req: Request, res: Response, next: NextFunction) => {
-    const userId = Number(req.params.userId);
-    const toDoId = Number(req.params.id);
+    const userId = Number(req.params.id);
+    const toDoId = Number(req.params.toDoId);
 
     const user = getUserById(userId);
     if (!user) {
@@ -92,7 +91,7 @@ export function checkToDosList(req: Request, res: Response, next: NextFunction) 
 
 // Middleware to check if users list is empty of a specific user
 export function checkToDosListOfUser(req: Request, res: Response, next: NextFunction) {
-  const userId = Number(req.params.userId); // Convert the id from string to number
+  const userId = Number(req.params.id); // Convert the id from string to number
   const toDos = getToDosByUserId(userId); // Get all toDos of a specific user from your todo service
 
   if (toDos.length === 0) {

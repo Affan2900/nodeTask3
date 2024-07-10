@@ -13,6 +13,6 @@ router.put('/users/:id',checkUsersList,validateUserUpdate, userController.update
 router.patch('/users/:id',checkUsersList,validateUserUpdate, userController.updateUser);
 router.delete('/users/:id',checkUsersList,validateUserById, userController.deleteUser);
 router.get('/users/:id/todos',checkUsersList,validateUserById,checkUserIsDisabled,checkToDosList,checkToDosListOfUser, userController.getAllToDosOfUser);
-router.get('/users/:userId/todos/:id',validateUserIdAndToDoIdParams, checkUsersList,checkUserIsDisabled,checkToDosList,checkToDosListOfUser, userController.getToDoByUserIdAndToDoId);  
+router.get('/users/:id/todos/:toDoId',validateUserIdAndToDoIdParams, checkUsersList,checkUserIsDisabled,checkToDosList,checkToDosListOfUser, userController.getToDoByUserIdAndToDoId);  
 
 export default router;
