@@ -89,13 +89,10 @@ export const deleteUser = (req: Request, res: Response): void =>{
 export const getAllToDosOfUser = (req: Request, res: Response) => {
   const userId = Number(req.params.id); // Convert the id from string to number
 
-  if (isNaN(userId)) {
-    return res.status(400).json({ error: 'Invalid user ID' });
-  }
 
   const todos = toDoService.getToDosByUserId(userId);
 
-  if (todos === undefined) {
+  if (todos.length === 0) {
     return res.status(404).json({ message: 'No todos found for this user' });
   }
 
@@ -105,9 +102,9 @@ export const getAllToDosOfUser = (req: Request, res: Response) => {
 //Method to get toDo by userId and toDoId
 export const getToDoByUserIdAndToDoId = (req: Request, res: Response) => {
     // Get the user ID from the request
-    const userId = Number(req.params.userId);
+    const userId = Number(req.params.id);
     //Get the toDo Id
-    const toDoId = Number(req.params.id);
+    const toDoId = Number(req.params.toDoId);
     if (isNaN(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
